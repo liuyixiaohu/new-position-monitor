@@ -1,0 +1,111 @@
+companies:
+  # --- Greenhouse ---
+  - name: Airbnb
+    ats: greenhouse
+    slug: airbnb
+  - name: Waymo
+    ats: greenhouse
+    slug: waymo
+  - name: Nuro
+    ats: greenhouse
+    slug: nuro
+  - name: Lucid Motors
+    ats: greenhouse
+    slug: lucidmotors
+  - name: Agility Robotics
+    ats: greenhouse
+    slug: agilityrobotics
+  - name: Locus Robotics
+    ats: greenhouse
+    slug: locusrobotics
+  - name: Fetch Robotics
+    ats: greenhouse
+    slug: fetch
+  - name: Anduril Industries
+    ats: greenhouse
+    slug: andurilindustries
+  # --- Ashby ---
+  - name: Figure AI
+    ats: ashby
+    slug: figure
+  # --- Amazon (custom API) ---
+  - name: Amazon
+    ats: amazon
+    slug: amazon
+  # --- Workday (undocumented API — may break) ---
+  - name: Intel
+    ats: workday
+    slug: intel
+    workday_site: External
+    workday_instance: wd1
+  - name: Boston Dynamics
+    ats: workday
+    slug: bostondynamics
+    workday_site: Boston_Dynamics
+    workday_instance: wd1
+  - name: NVIDIA
+    ats: workday
+    slug: nvidia
+    workday_site: NVIDIAExternalCareerSite
+    workday_instance: wd5
+  - name: Rockwell Automation
+    ats: workday
+    slug: rockwellautomation
+    workday_site: External_Rockwell_Automation
+    workday_instance: wd1
+  # --- SmartRecruiters ---
+  - name: Intuitive Surgical
+    ats: smartrecruiters
+    slug: intuitive
+  # --- Phenom ---
+  - name: Adobe
+    ats: phenom
+    slug: adobe
+    phenom_url: "https://careers.adobe.com/us/en/search-results"
+
+# Filters: Product Marketing internship positions
+# Title must match at least one keyword from EACH group (AND logic)
+filters:
+  # Group 1: Must be an internship
+  intern_keywords:
+    - "intern"
+    - "internship"
+  # Group 2: Must be product marketing related
+  role_keywords:
+    - "product marketing"
+    - "marketing"
+    - "PMM"
+    - "growth"
+    - "go-to-market"
+    - "GTM"
+    - "brand"
+    - "content"
+    - "communications"
+  # Group 3: Must be in the US (matches against location field)
+  location_keywords:
+    - "United States"
+    - ", CA"
+    - ", NY"
+    - ", TX"
+    - ", WA"
+    - ", MA"
+    - ", IL"
+    - ", CO"
+    - ", PA"
+    - ", GA"
+    - ", MI"
+    - ", OR"
+    - ", AZ"
+    - ", VA"
+    - ", NC"
+    - ", OH"
+    - ", MN"
+    - ", NJ"
+    - "California"
+    - "New York"
+    - "Texas"
+    - "Washington"
+    - "Remote"
+    - "US"
+    - "USA"
+  case_sensitive: false

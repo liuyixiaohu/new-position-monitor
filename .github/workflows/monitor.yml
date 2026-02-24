@@ -1,0 +1,49 @@
+name: Monitor Job Positions
+
+on:
+  schedule:
+    # Daily at 4AM UTC = 8PM PST
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Seed mode (save snapshots only, no notifications)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run monitor
+        run: |
+          if [ "${{ github.event.inputs.seed }}" = "true" ]; then
+            python monitor.py --seed
+          else
+            python monitor.py
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit updated snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --staged --quiet || git commit -m "Update job snapshots $(date -u +%Y-%m-%d)"
+          git push

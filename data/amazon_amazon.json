@@ -1,0 +1,26 @@
+{
+  "company": "Amazon",
+  "ats": "amazon",
+  "slug": "amazon",
+  "fetched_at": "2026-02-24T12:59:20.097906+00:00",
+  "jobs": [
+    {
+      "id": "3127134",
+      "title": "2026  Amazon Communications Assistant Summer Internship",
+      "location": "Seattle, Washington, USA",
+      "department": "PR",
+      "url": "https://www.amazon.jobs/en/jobs/3127134/2026-amazon-communications-assistant-summer-internship",
+      "posted_date": "November 15, 2025",
+      "updated_at": "25 days"
+    },
+    {
+      "id": "3037586",
+      "title": "2026 Marketing Intern",
+      "location": "Seattle, Washington, USA",
+      "department": "Marketing & PR",
+      "url": "https://www.amazon.jobs/en/jobs/3037586/2026-marketing-intern",
+      "posted_date": "July 17, 2025",
+      "updated_at": "about 2 months"
+    }
+  ]
+}
