@@ -69,6 +69,8 @@ You can also trigger manually: **Actions tab → "Monitor Job Positions" → Run
 | Amazon | `amazon.jobs/en/search.json` | No | Custom API |
 | Workday | `{slug}.{instance}.myworkdayjobs.com/wday/cxs/{slug}/{site}/jobs` | No | Undocumented, may break |
 | Phenom | Embedded JSON in career page HTML | No | HTML parsing, may break |
+| iCIMS | `careers.{company}.com/api/jobs` | No | Public JSON API |
+| SerpApi | `serpapi.com/search?engine=google_jobs` | API Key | Free 100 searches/month |
 
 ### Finding a company's ATS slug
 
@@ -97,6 +99,8 @@ You can also trigger manually: **Actions tab → "Monitor Job Positions" → Run
 | Rockwell Automation | Workday | ✅ Monitored |
 | Intuitive Surgical | SmartRecruiters | ✅ Monitored |
 | Adobe | Phenom | ✅ Monitored |
+| Rivian | iCIMS | ✅ Monitored |
+| Tesla | SerpApi (Google Jobs) | ✅ Monitored |
 
 ### Companies Not Yet Supported
 
@@ -105,9 +109,8 @@ You can also trigger manually: **Actions tab → "Monitor Job Positions" → Run
 | Google | Custom (rp2talent) | Proprietary system |
 | Microsoft | Eightfold | No public API, SPA rendering |
 | Qualcomm | Eightfold | No public API |
-| Tesla | Unknown | Blocked by CDN |
 | TikTok/ByteDance | Custom (Feishu) | Proprietary system |
-| Rivian | iCIMS | Requires HTML parsing |
+
 | Teradyne | SAP SuccessFactors | No public API |
 | Cruise | Shut down | Defunct, redirects to GM |
 

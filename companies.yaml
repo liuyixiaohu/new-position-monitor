@@ -62,6 +62,17 @@ companies:
     ats: phenom
     slug: adobe
     phenom_url: "https://careers.adobe.com/us/en/search-results"
+  # --- iCIMS ---
+  - name: Rivian
+    ats: icims
+    slug: rivian
+    icims_url: "https://careers.rivian.com/api/jobs"
+  # --- SerpApi (Google Jobs) — for companies without direct ATS API ---
+  - name: Tesla
+    ats: serpapi
+    slug: tesla
+    serpapi_query: "Tesla marketing intern United States"
+    serpapi_gl: us
 
 # Filters: Product Marketing internship positions
 # Title must match at least one keyword from EACH group (AND logic)

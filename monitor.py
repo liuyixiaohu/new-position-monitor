@@ -48,7 +48,7 @@ def load_config(path: str = None) -> dict:
             if field not in company:
                 print(f"ERROR: Company entry missing '{field}': {company}")
                 sys.exit(1)
-        if company["ats"] not in ("greenhouse", "lever", "ashby", "amazon", "workday", "smartrecruiters", "phenom"):
+        if company["ats"] not in ("greenhouse", "lever", "ashby", "amazon", "workday", "smartrecruiters", "phenom", "icims", "serpapi"):
             print(f"ERROR: Unknown ATS type '{company['ats']}' for {company['name']}")
             sys.exit(1)
 
@@ -72,6 +72,10 @@ def fetch_jobs(company: dict) -> list[dict]:
         return fetch_smartrecruiters(slug)
     if ats == "phenom":
         return fetch_phenom(company)
+    if ats == "icims":
+        return fetch_icims(company)
+    if ats == "serpapi":
+        return fetch_serpapi(company)
 
     fetchers = {
         "greenhouse": fetch_greenhouse,
@@ -419,6 +423,131 @@ def fetch_phenom(company: dict) -> list[dict]:
         if len(jobs) < 10:
             break
         if offset >= 10000:
+            break
+
+    return all_jobs
+
+
+def fetch_icims(company: dict) -> list[dict]:
+    """
+    Fetch jobs from iCIMS-powered career sites (e.g., Rivian).
+
+    Uses the public JSON API at {icims_url}?offset=N&limit=100.
+    """
+    icims_url = company.get("icims_url", "")
+    if not icims_url:
+        print(f"  ⚠️  No icims_url configured for {company['name']}")
+        return []
+
+    all_jobs = []
+    offset = 0
+    page_size = 100
+
+    while True:
+        params = {"offset": offset, "limit": page_size}
+        resp = requests.get(icims_url, params=params, timeout=REQUEST_TIMEOUT)
+        resp.raise_for_status()
+        data = resp.json()
+
+        postings = data.get("jobs", [])
+        if not postings:
+            break
+
+        for job in postings:
+            job_data = job.get("data", {})
+
+            # Extract department from categories list
+            categories = job_data.get("categories", [])
+            dept = categories[0].get("name", "") if categories else ""
+
+            all_jobs.append({
+                "id": str(job_data.get("slug", "")),
+                "title": job_data.get("title", ""),
+                "location": job_data.get("location_name", ""),
+                "department": dept,
+                "url": job_data.get("apply_url", ""),
+                "posted_date": job_data.get("posted_date", ""),
+                "updated_at": job_data.get("update_date", ""),
+            })
+
+        total = data.get("totalCount", 0)
+        offset += page_size
+        if offset >= total:
+            break
+        if offset >= 10000:
+            break
+
+    return all_jobs
+
+
+def fetch_serpapi(company: dict) -> list[dict]:
+    """
+    Fetch jobs via SerpApi's Google Jobs API.
+
+    Used for companies with no direct ATS API (e.g., Tesla).
+    Requires SERPAPI_KEY environment variable.
+    """
+    api_key = os.environ.get("SERPAPI_KEY", "")
+    if not api_key:
+        print(f"  ⚠️  SERPAPI_KEY not set, skipping {company['name']}")
+        return []
+
+    query = company.get("serpapi_query", "")
+    if not query:
+        print(f"  ⚠️  No serpapi_query configured for {company['name']}")
+        return []
+
+    all_jobs = []
+    start = 0
+
+    while True:
+        params = {
+            "engine": "google_jobs",
+            "q": query,
+            "api_key": api_key,
+            "start": start,
+        }
+        # Add optional location bias
+        gl = company.get("serpapi_gl", "us")
+        if gl:
+            params["gl"] = gl
+
+        resp = requests.get(
+            "https://serpapi.com/search", params=params, timeout=REQUEST_TIMEOUT
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        jobs = data.get("jobs_results", [])
+        if not jobs:
+            break
+
+        for job in jobs:
+            # Build location string
+            location = job.get("location", "")
+
+            # Use job_id from SerpApi or fall back to title hash
+            job_id = job.get("job_id", "")
+
+            # Extract apply link (first option or empty)
+            apply_options = job.get("apply_options", [])
+            apply_url = apply_options[0].get("link", "") if apply_options else ""
+
+            all_jobs.append({
+                "id": str(job_id),
+                "title": job.get("title", ""),
+                "location": location,
+                "department": job.get("company_name", ""),
+                "url": apply_url,
+                "posted_date": job.get("detected_extensions", {}).get("posted_at", ""),
+                "updated_at": "",
+            })
+
+        # Google Jobs paginates in chunks of 10
+        start += 10
+
+        # SerpApi free tier: be conservative, max 2 pages per company
+        if start >= 20:
             break
 
     return all_jobs
