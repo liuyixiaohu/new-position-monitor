@@ -2,7 +2,7 @@
   "company": "Amazon",
   "ats": "amazon",
   "slug": "amazon",
-  "fetched_at": "2026-02-24T20:49:25.495575+00:00",
+  "fetched_at": "2026-03-01T05:15:51.059881+00:00",
   "jobs": [
     {
       "id": "3127134",
@@ -11,7 +11,7 @@
       "department": "PR",
       "url": "https://www.amazon.jobs/en/jobs/3127134/2026-amazon-communications-assistant-summer-internship",
       "posted_date": "November 15, 2025",
-      "updated_at": "25 days"
+      "updated_at": "30 days"
     },
     {
       "id": "3037586",
@@ -20,7 +20,7 @@
       "department": "Marketing & PR",
       "url": "https://www.amazon.jobs/en/jobs/3037586/2026-marketing-intern",
       "posted_date": "July 17, 2025",
-      "updated_at": "about 2 months"
+      "updated_at": "1 day"
     }
   ]
 }
