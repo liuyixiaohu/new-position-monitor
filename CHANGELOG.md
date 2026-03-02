@@ -1,5 +1,25 @@
 # Changelog
 
+## v3.0 (2026-03-01)
+
+### Refactored
+- Split 905-line `monitor.py` monolith into 8 modular files under `src/`:
+  - `models.py` — `Job` TypedDict
+  - `config.py` — config loading, validation, constants
+  - `fetchers.py` — all 9 ATS fetchers with retry logic
+  - `filters.py` — keyword filtering
+  - `snapshot.py` — snapshot load/save
+  - `differ.py` — diff detection and date-based filtering
+  - `notifier.py` — GitHub Issue formatting and creation
+  - `main.py` — thin orchestrator
+- `monitor.py` kept as backward-compatible wrapper
+
+### Fixed
+- Workday job ID fallback: use `externalPath` instead of fragile `bulletFields[0]`
+- Issue title now derived from filter config instead of hardcoded "Marketing Intern"
+- Added `_get_with_retry` / `_post_with_retry` to all fetchers for transient failure resilience
+- Updated GitHub Actions workflow to use `src/main.py`
+
 ## v2.1 (2026-03-01)
 
 ### Improved
