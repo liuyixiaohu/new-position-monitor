@@ -33,9 +33,9 @@ jobs:
       - name: Run monitor
         run: |
           if [ "${{ github.event.inputs.seed }}" = "true" ]; then
-            python monitor.py --seed
+            python src/main.py --seed
           else
-            python monitor.py
+            python src/main.py
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
