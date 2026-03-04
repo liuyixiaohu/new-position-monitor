@@ -21,9 +21,6 @@ companies:
   - name: Fetch Robotics
     ats: greenhouse
     slug: fetch
-  - name: Anduril Industries
-    ats: greenhouse
-    slug: andurilindustries
   # --- Ashby ---
   - name: Figure AI
     ats: ashby
