@@ -1,50 +1,109 @@
-# NewPositionMonitor
+# Job Position Monitor
 
-Monitor target companies for new job positions via their ATS (Applicant Tracking System) public APIs. Runs daily on GitHub Actions and creates a GitHub Issue when new matching positions are found.
+**Automatically track new job openings at companies you care about — get notified daily via GitHub.**
+
+Tired of manually refreshing career pages every day? This tool checks them for you. It monitors the job boards of your target companies, filters by keywords (e.g., "intern" + "marketing"), and creates a GitHub notification whenever new matching positions appear.
 
 ## How It Works
 
-1. **Fetches** job listings from multiple ATS public APIs (Greenhouse, Ashby, Workday, SmartRecruiters, Phenom, Amazon)
-2. **Filters** by keywords (e.g., "intern" + "marketing" + US location)
-3. **Compares** against previous snapshots stored in `data/`
-4. **Notifies** via GitHub Issue when new positions appear
-5. **Commits** updated snapshots back to the repo
+```
+  ┌─────────────┐     ┌──────────────┐     ┌──────────────┐     ┌───────────────┐
+  │  Every day   │────▶│  Fetch jobs   │────▶│  Filter by   │────▶│  Compare with │
+  │  (automatic) │     │  from career  │     │  keywords &  │     │  yesterday    │
+  └─────────────┘     │  pages        │     │  location    │     └──────┬────────┘
+                      └──────────────┘     └──────────────┘            │
+                                                                  New jobs?
+                                                               Yes │      │ No
+                                                          ┌────────▼──┐   │
+                                                          │  Create   │   │ Done, wait
+                                                          │  GitHub   │   │ until
+                                                          │  Issue    │   │ tomorrow
+                                                          └───────────┘   │
+```
 
-## Quick Start
+1. A scheduled job runs every day at 8 PM PST
+2. It fetches job listings from each company's career page API
+3. It filters results by your keywords (role type, department, location)
+4. It compares against the previous day's snapshot
+5. If new matching jobs are found, it creates a GitHub Issue with direct apply links
 
-### 1. Configure your target companies
+## What a Notification Looks Like
 
-Edit `companies.yaml` to add/remove companies:
+When new jobs are found, you'll get a GitHub Issue like this:
+
+> **New Intern Marketing Positions — 2025-06-15**
+>
+> **Companies with new positions:** 3
+> **Total new positions:** 7
+>
+> ### Waymo (Greenhouse)
+> | Title | Location | Posted | Link |
+> |-------|----------|--------|------|
+> | Marketing Intern, Summer 2025 | Mountain View, CA | 2025-06-14 | [Apply](https://...) |
+>
+> ### NVIDIA (Workday)
+> | Title | Department | Location | Posted | Link |
+> |-------|------------|----------|--------|------|
+> | Product Marketing Intern | Marketing | Santa Clara, CA | 2025-06-13 | [Apply](https://...) |
+
+## Currently Monitored Companies
+
+| Company | Career Page System |
+|---------|-------------------|
+| Airbnb, Waymo, Nuro, Lucid Motors, Agility Robotics, Locus Robotics, Fetch Robotics, Anduril Industries | Greenhouse |
+| Figure AI | Ashby |
+| Amazon | Custom career API |
+| Intel, Boston Dynamics, NVIDIA, Rockwell Automation | Workday |
+| Intuitive Surgical | SmartRecruiters |
+| Adobe | Phenom |
+| Rivian | iCIMS |
+| Tesla | Google Jobs (via SerpApi) |
+
+> Some companies (Google, Microsoft, Qualcomm, TikTok) use proprietary career systems that don't have public APIs. These are not currently supported.
+
+## Set Up Your Own
+
+### 1. Fork this repo
+
+Click the **Fork** button at the top right of this page.
+
+### 2. Add your target companies
+
+Edit `companies.yaml` to list the companies you want to monitor:
 
 ```yaml
 companies:
-  - name: Waymo
-    ats: greenhouse      # greenhouse, lever, ashby, workday, amazon, smartrecruiters, phenom
-    slug: waymo          # company identifier in ATS URL
+  - name: Waymo              # Company name (for display)
+    ats: greenhouse           # Which career page system they use (see table below)
+    slug: waymo               # The company's ID in their career page URL
 ```
 
-### 2. Configure filters
+**How to find a company's slug:** Go to their careers page. The URL usually looks like `jobs.greenhouse.io/waymo` or `jobs.lever.co/stripe` — the last part is the slug.
+
+### 3. Set your filters
+
+In the same `companies.yaml`, define what jobs you're looking for:
 
 ```yaml
 filters:
-  intern_keywords:       # Must match at least one (AND with role_keywords)
+  intern_keywords:            # Job must contain one of these...
     - "intern"
-  role_keywords:         # Must match at least one
+  role_keywords:              # ...AND one of these
     - "marketing"
     - "product marketing"
-  location_keywords:     # Must match at least one (location field)
+  location_keywords:          # ...AND be in one of these locations
     - "United States"
     - ", CA"
     - "Remote"
-  case_sensitive: false
+  case_sensitive: false       # Ignore uppercase/lowercase
 ```
 
-### 3. First run (seed mode)
+### 4. Run the first time (seed mode)
 
-Seed mode saves snapshots without sending notifications — prevents a massive "everything is new" issue:
+The first run saves a snapshot of current jobs without sending notifications — otherwise you'd get a massive "everything is new" alert:
 
 ```bash
-# Locally
+# On your computer
 pip install -r requirements.txt
 python monitor.py --seed
 
@@ -52,75 +111,58 @@ python monitor.py --seed
 # Go to Actions tab → "Monitor Job Positions" → Run workflow → Check "Seed mode"
 ```
 
-### 4. Daily monitoring
+### 5. Daily monitoring
 
-After seeding, the workflow runs automatically every day at 8PM PST. You'll receive a GitHub Issue whenever new matching positions are found.
+After seeding, the workflow runs automatically every day at 8 PM PST. You'll get a GitHub Issue whenever new matching positions appear.
 
-You can also trigger manually: **Actions tab → "Monitor Job Positions" → Run workflow**.
+You can also trigger manually: **Actions** → **Monitor Job Positions** → **Run workflow**.
 
-## Supported ATS Systems
+To get email notifications, make sure you're **Watching** your fork (click the **Watch** button → **All Activity**).
 
-| ATS | API Endpoint | Auth | Notes |
-|-----|-------------|------|-------|
-| Greenhouse | `boards-api.greenhouse.io/v1/boards/{slug}/jobs` | No | Official public API |
-| Lever | `api.lever.co/v0/postings/{slug}?mode=json` | No | Official public API |
-| Ashby | `api.ashbyhq.com/posting-api/job-board/{slug}` | No | Official public API |
-| SmartRecruiters | `api.smartrecruiters.com/v1/companies/{slug}/postings` | No | Official public API |
-| Amazon | `amazon.jobs/en/search.json` | No | Custom API |
-| Workday | `{slug}.{instance}.myworkdayjobs.com/wday/cxs/{slug}/{site}/jobs` | No | Undocumented, may break |
-| Phenom | Embedded JSON in career page HTML | No | HTML parsing, may break |
-| iCIMS | `careers.{company}.com/api/jobs` | No | Public JSON API |
-| SerpApi | `serpapi.com/search?engine=google_jobs` | API Key | Free 100 searches/month |
+## Supported Career Page Systems
 
-### Finding a company's ATS slug
+This tool works with 9 different career page systems (called ATS — Applicant Tracking Systems). Most major tech companies use one of these:
 
-- **Greenhouse**: Look at `boards.greenhouse.io/{slug}` in their careers page URL
-- **Lever**: Look at `jobs.lever.co/{slug}` in their careers page URL
-- **Ashby**: Look at `jobs.ashbyhq.com/{slug}` in their careers page URL
-- **SmartRecruiters**: Look at `jobs.smartrecruiters.com/{slug}` in their careers page URL
+| System | How It Works | Notes |
+|--------|-------------|-------|
+| Greenhouse | Official public API | Most reliable |
+| Lever | Official public API | Most reliable |
+| Ashby | Official public API | Most reliable |
+| SmartRecruiters | Official public API | Most reliable |
+| iCIMS | Public JSON API | Reliable |
+| Amazon | Custom career API | Reliable |
+| SerpApi | Searches Google Jobs | Free tier: 100 searches/month |
+| Workday | Undocumented API | Works but may break with updates |
+| Phenom | Reads career page HTML | Works but may break with updates |
 
-## Currently Monitored Companies
+### Finding which system a company uses
 
-| Company | ATS | Status |
-|---------|-----|--------|
-| Airbnb | Greenhouse | ✅ Monitored |
-| Waymo | Greenhouse | ✅ Monitored |
-| Nuro | Greenhouse | ✅ Monitored |
-| Lucid Motors | Greenhouse | ✅ Monitored |
-| Agility Robotics | Greenhouse | ✅ Monitored |
-| Locus Robotics | Greenhouse | ✅ Monitored |
-| Fetch Robotics | Greenhouse | ✅ Monitored |
-| Anduril Industries | Greenhouse | ✅ Monitored |
-| Figure AI | Ashby | ✅ Monitored |
-| Amazon | Custom API | ✅ Monitored |
-| Intel | Workday | ✅ Monitored |
-| Boston Dynamics | Workday | ✅ Monitored |
-| NVIDIA | Workday | ✅ Monitored |
-| Rockwell Automation | Workday | ✅ Monitored |
-| Intuitive Surgical | SmartRecruiters | ✅ Monitored |
-| Adobe | Phenom | ✅ Monitored |
-| Rivian | iCIMS | ✅ Monitored |
-| Tesla | SerpApi (Google Jobs) | ✅ Monitored |
-
-### Companies Not Yet Supported
-
-| Company | ATS | Issue |
-|---------|-----|-------|
-| Google | Custom (rp2talent) | Proprietary system |
-| Microsoft | Eightfold | No public API, SPA rendering |
-| Qualcomm | Eightfold | No public API |
-| TikTok/ByteDance | Custom (Feishu) | Proprietary system |
-
-| Teradyne | SAP SuccessFactors | No public API |
-| Cruise | Shut down | Defunct, redirects to GM |
+Visit the company's careers page and look at the URL:
+- `boards.greenhouse.io/company` → Greenhouse
+- `jobs.lever.co/company` → Lever
+- `jobs.ashbyhq.com/company` → Ashby
+- `jobs.smartrecruiters.com/company` → SmartRecruiters
+- `company.wd1.myworkdayjobs.com` → Workday
 
 ## Project Structure
 
 ```
-├── .github/workflows/monitor.yml   # GitHub Actions daily cron (8PM PST)
+├── .github/workflows/monitor.yml   # Scheduled job (runs daily at 8 PM PST)
+├── companies.yaml                   # Your target companies + keyword filters
+├── monitor.py                       # Entry point (delegates to src/)
 ├── data/                            # Job snapshots (auto-managed)
-├── companies.yaml                   # Your target companies + filters
-├── monitor.py                       # Main script
-├── requirements.txt                 # Python dependencies
-└── README.md
+├── src/
+│   ├── main.py                      # Orchestrator — runs the whole pipeline
+│   ├── fetchers.py                  # Talks to each career page API
+│   ├── filters.py                   # Applies keyword + location filters
+│   ├── differ.py                    # Finds what's new vs. yesterday
+│   ├── snapshot.py                  # Saves/loads daily snapshots
+│   ├── notifier.py                  # Creates GitHub Issues
+│   ├── config.py                    # Reads companies.yaml
+│   └── models.py                    # Data structure definitions
+└── requirements.txt                 # Python packages needed
 ```
+
+## License
+
+MIT
