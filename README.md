@@ -1,5 +1,9 @@
 # Job Position Monitor
 
+[![Daily Monitor](https://github.com/liuyixiaohu/new-position-monitor/actions/workflows/monitor.yml/badge.svg)](https://github.com/liuyixiaohu/new-position-monitor/actions/workflows/monitor.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://python.org)
+
 **Automatically track new job openings at companies you care about — get notified daily via GitHub.**
 
 Tired of manually refreshing career pages every day? This tool checks them for you. It monitors the job boards of your target companies, filters by keywords (e.g., "intern" + "marketing"), and creates a GitHub notification whenever new matching positions appear.
