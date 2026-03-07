@@ -2,8 +2,17 @@
   "company": "Amazon",
   "ats": "amazon",
   "slug": "amazon",
-  "fetched_at": "2026-03-06T05:07:37.448344+00:00",
+  "fetched_at": "2026-03-07T04:57:42.027327+00:00",
   "jobs": [
+    {
+      "id": "3198502",
+      "title": "Intern - Economics, Private Brands - Intelligence",
+      "location": "New York, New York, USA",
+      "department": "Economics",
+      "url": "https://www.amazon.jobs/en/jobs/3198502/intern-economics-private-brands-intelligence",
+      "posted_date": "March  6, 2026",
+      "updated_at": "about 11 hours"
+    },
     {
       "id": "3127134",
       "title": "2026  Amazon Communications Assistant Summer Internship",
@@ -12,15 +21,6 @@
       "url": "https://www.amazon.jobs/en/jobs/3127134/2026-amazon-communications-assistant-summer-internship",
       "posted_date": "November 15, 2025",
       "updated_at": "about 1 month"
-    },
-    {
-      "id": "3037586",
-      "title": "2026 Marketing Intern",
-      "location": "Seattle, Washington, USA",
-      "department": "Marketing & PR",
-      "url": "https://www.amazon.jobs/en/jobs/3037586/2026-marketing-intern",
-      "posted_date": "July 17, 2025",
-      "updated_at": "6 days"
     }
   ]
 }
